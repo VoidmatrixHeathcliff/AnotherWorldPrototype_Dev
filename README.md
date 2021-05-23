@@ -1,2 +1,3 @@
 # AnotherWorldPrototype_Dev
-Another World 游戏原型开发代码同步仓库
+
+Another World 原型开发基于 [EtherEngine](https://github.com/EtherProject/EtherEngine)
