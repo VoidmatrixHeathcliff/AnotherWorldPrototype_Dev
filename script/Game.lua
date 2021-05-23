@@ -84,6 +84,20 @@ end
 
 local _commonWidth, _commonheight = mGraphic.GetUTF8TextSize(font, resultList[1])
 
+rectZone = {
+    x = rectViewPort.x - 10,
+    y = rectViewPort.y - 10,
+    w = rectViewPort.w + 20,
+    h = rectViewPort.h + 20
+}
+
+rectBar = {
+    x = rectZone.x + rectZone.w + 5,
+    y = rectZone.y,
+    w = 15,
+    h = rectZone.h
+}
+
 while g_bIsRunning do
     
     local _nStartTime = mTime.GetInitTime()
@@ -142,22 +156,18 @@ while g_bIsRunning do
                 h = _commonheight
             })
         end
-
-        -- local _rect = {x = rectViewPort.x, y = rectViewPort.y + _height * (index - 1) - rectRenderPort.y, w = _width, h = _height}
-        -- if _rect.y < rectViewPort.y then
-        --     mGraphic.CopyReshapeTexture(_texture, {x = 0, y = _rect.h, w = _rect.w, h = rectViewPort.y - _rect.y}, _rect)
-        -- end
-        -- if _rect.y + _rect.h > rectViewPort.y + rectViewPort.h then
-        --     _rect.h = rectViewPort.y + rectViewPort.h - _rect.y
-        --     mGraphic.CopyReshapeTexture(_texture, {x = 0, y = 0, w = _rect.w, h = _rect.h}, _rect)
-        --     break
-        -- else
-        --     mGraphic.CopyTexture(_texture, _rect)
-        -- end
     end
 
     mGraphic.SetDrawColor({r = 255, g = 255, b = 255, a = 255})
-    mGraphic.RoundRectangle({x = rectViewPort.x - 10, y = rectViewPort.y - 10, w = rectViewPort.w + 20, h = rectViewPort.h + 20}, 10)
+    mGraphic.RoundRectangle(rectZone, 5)
+
+    mGraphic.RoundRectangle(rectBar, 5)
+    mGraphic.FillRoundRectangle({
+        x = rectBar.x,
+        y = rectBar.y + rectRenderPort.y / (_commonheight * #resultList) * rectBar.h,
+        w = rectBar.w,
+        h = rectRenderPort.h / (_commonheight * #resultList) * rectBar.h
+    }, 5)
 
     mWindow.UpdateWindow()
     
