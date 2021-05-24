@@ -9,8 +9,6 @@ local _nTextHeight = _uFont:GetHeight()
 
 local _tbText = {}
 
-local _tbMultilineText = {}
-
 local _nMargin, _nBorder = 10, 5
 
 local _nWidthScrollBar = 15
@@ -45,56 +43,63 @@ local _rcScrollBar = {
     h = _rcSelf.h
 }
 
+local _tbRenderedText = {}
+
 local function _GetRCSlider()
     return {
         x = _rcScrollBar.x,
-        y = _rcScrollBar.y + _rcViewPort.y / (_nTextHeight * #_tbMultilineText)
+        y = _rcScrollBar.y + _rcViewPort.y / (_nTextHeight * #_tbText)
             * _rcScrollBar.h,
         w = _rcScrollBar.w,
-        h = _rcViewPort.h / math.max(_nTextHeight * #_tbMultilineText, _rcViewPort.h)
+        h = _rcViewPort.h / math.max(_nTextHeight * #_tbText, _rcViewPort.h)
             * _rcScrollBar.h
     }
 end
 
 local function _AppendText(str)
-    table.insert(_tbText, str)
-    local _rcViewPort = _rcViewPort
+    -- 通过视口位置判断当前滑块是否到达底部
+    local _bReachBottom = _rcViewPort.y + _rcViewPort.h == _nTextHeight * #_tbText
+    -- 将过长的字符串分割添加至字符串列表
     while true do
         local _rawStrWidth, _rawStrHeight = _Graphic.GetUTF8TextSize(_uFont, str)
         if _rawStrWidth <= _rcViewPort.w then
-            table.insert(_tbMultilineText, str)
+            table.insert(_tbText, str)
             break
         else
             for index = _String.LenUTF8(str), 1, -1 do
                 local _strTemp = _String.SubStrUTF8(str, 1, index)
                 local _strWidth, _strHeight = _Graphic.GetUTF8TextSize(_uFont, _strTemp)
                 if _strWidth <= _rcViewPort.w then
-                    table.insert(_tbMultilineText, _strTemp)
+                    table.insert(_tbText, _strTemp)
                     str = _String.SubStrUTF8(str, index + 1)
                     break
                 end
             end
         end
     end
+    -- 如果滑块到达底部并且用户没有按下滑块，则移动视口到最底部（滑块滑动至最底）
+    if _bReachBottom and (not _bSliderDown) then
+        _rcViewPort.y = math.max(_nTextHeight * #_tbText, _rcViewPort.h) - _rcViewPort.h
+    end
 end
 
 local function _HandleEvent(event)
     if event == _Interactivity.EVENT_MOUSESCROLL then
         local _horizontal, _vertical = _Interactivity.GetScrollValue()
-        if _nTextHeight * #_tbMultilineText > _rcViewPort.h then
+        if _nTextHeight * #_tbText > _rcViewPort.h then
             _rcViewPort.y = _Algorithm.Clamp(
                 _rcViewPort.y - _vertical * 10,
-                0, _nTextHeight * #_tbMultilineText - _rcViewPort.h
+                0, _nTextHeight * #_tbText - _rcViewPort.h
             )
         end
     elseif event == _Interactivity.EVENT_MOUSEMOTION then
         _bSliderHover = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), _GetRCSlider())
         if _bSliderDown then
             local _tbCursorPos = _Interactivity.GetCursorPosition()
-            if _nTextHeight * #_tbMultilineText > _rcViewPort.h then
+            if _nTextHeight * #_tbText > _rcViewPort.h then
                 _rcViewPort.y = _Algorithm.Clamp(_rcViewPort.y + (_tbCursorPos.y - _nPreviousY) 
-                    * math.max(_nTextHeight * #_tbMultilineText, _rcViewPort.h) / _rcViewPort.h,
-                    0, _nTextHeight * #_tbMultilineText - _rcViewPort.h
+                    * math.max(_nTextHeight * #_tbText, _rcViewPort.h) / _rcViewPort.h,
+                    0, _nTextHeight * #_tbText - _rcViewPort.h
                 )
                 _nPreviousY = _tbCursorPos.y
             end
@@ -111,7 +116,6 @@ local function _HandleEvent(event)
 end
 
 local function _DrawSelf()
-
     -- 绘制文本区域底色
     _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
     _Graphic.FillRectangle(_rcContent)
@@ -180,13 +184,22 @@ local function _DrawSelf()
         w = _rcViewPort.w,
         h = _rcViewPort.h
     }
-    for index = _rcViewPort.y // _nTextHeight + 1, #_tbMultilineText do
-        local _image = _Graphic.CreateUTF8TextImageBlended(
-            _uFont, _tbMultilineText[index],
-            {r = 200, g = 200, b = 200, a = 255}
-        )
-        local _texture = _Graphic.CreateTexture(_image)
-        local _width, _height = _image:GetSize()
+    for index = 1, _rcViewPort.y // _nTextHeight + 1 do
+        _tbRenderedText[index] = nil
+    end
+    for index = _rcViewPort.y // _nTextHeight + 1, #_tbText do
+        -- 如果已渲染列表中没有当前文本图片，则渲染此文本
+        if not _tbRenderedText[index] then
+            local _image = _Graphic.CreateUTF8TextImageBlended(
+                _uFont, _tbText[index],
+                {r = 200, g = 200, b = 200, a = 255}
+            )
+            local _width, _height = _image:GetSize()
+            _tbRenderedText[index] = {
+                texture = _Graphic.CreateTexture(_image),
+                width = _width
+            }
+        end 
         if _nTextHeight * (index - 1) < _rcViewPort.y then
             local _rectCut = {
                 x = 0,
@@ -194,10 +207,10 @@ local function _DrawSelf()
                 w = _rcViewPort.w,
                 h = _nTextHeight * index - _rcViewPort.y
             }
-            _Graphic.CopyReshapeTexture(_texture, _rectCut, {
+            _Graphic.CopyReshapeTexture(_tbRenderedText[index].texture, _rectCut, {
                 x = _rcCopyDst.x,
                 y = _rcCopyDst.y,
-                w = _width,
+                w = _tbRenderedText[index].width,
                 h = _rectCut.h
             })
         elseif _nTextHeight * index > _rcViewPort.y + _rcViewPort.h then
@@ -207,18 +220,18 @@ local function _DrawSelf()
                 w = _rcViewPort.w,
                 h = _rcViewPort.y + _rcViewPort.h - _nTextHeight * (index - 1)
             }
-            _Graphic.CopyReshapeTexture(_texture, _rectCut, {
+            _Graphic.CopyReshapeTexture(_tbRenderedText[index].texture, _rectCut, {
                 x = _rcCopyDst.x,
                 y = _rcCopyDst.y + _rcCopyDst.h - _rectCut.h,
-                w = _width,
+                w = _tbRenderedText[index].width,
                 h = _rectCut.h
             })
             break
         else
-            _Graphic.CopyTexture(_texture, {
+            _Graphic.CopyTexture(_tbRenderedText[index].texture, {
                 x = _rcCopyDst.x,
                 y = _rcCopyDst.y + _nTextHeight * (index - 1) - _rcViewPort.y,
-                w = _width,
+                w = _tbRenderedText[index].width,
                 h = _nTextHeight
             })
         end
