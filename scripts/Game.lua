@@ -47,11 +47,10 @@ textList = {
 
 for _, text in ipairs(textList) do
     TextView.AppendText(text)
+    break
 end
 
 os.execute("chcp 65001")
-
-renderList = {}
 
 while g_bIsRunning do
     
@@ -64,6 +63,8 @@ while g_bIsRunning do
         local _event = mInteract.GetEventType()
         if _event == mInteract.EVENT_QUIT then
             g_bIsRunning = false
+        elseif _event == mInteract.EVENT_KEYDOWN_M then
+            TextView.AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
         end
         TextView.HandleEvent(_event)
     end
@@ -75,5 +76,5 @@ while g_bIsRunning do
     mTime.DynamicSleep(
         1000 / mConfig.N_FPS,
         mTime.GetInitTime() - _nStartTime
-)
+    )
 end
