@@ -3,6 +3,7 @@
     "package": {
         "path": [
             "scripts/?.lua",
+            "scripts/NiceGUI/?.lua",
             "modules/?.lua"            
         ],
         "cpath": [

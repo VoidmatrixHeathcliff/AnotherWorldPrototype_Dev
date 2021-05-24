@@ -1,5 +1,5 @@
 mConfig = require("Config")
-TextView = require("TextView")
+-- TextView = require("TextView")
 
 mTime = UsingModule("Time")
 mString = UsingModule("String")
@@ -9,6 +9,8 @@ mAlgorithm = UsingModule("Algorithm")
 mInteract = UsingModule("Interactivity")
 
 mWindow.CreateWindow("Another World - 未登录", mConfig.RC_WINDOW, {})
+
+mGUI = UsingModule("NiceGUI")
 
 g_bIsRunning = true
 
@@ -45,10 +47,26 @@ textList = {
     "【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点",
 }
 
+textView = mGUI.TextView()
+
+textView:Transform({
+    x = 200, y = 90,
+    w = 500, h = 600
+})
+
+textView_1 = mGUI.TextView()
+
+-- textView_1:Transform({
+--     x = 650, y = 90,
+--     w = 395, h = 600
+-- })
+
 for _, text in ipairs(textList) do
-    TextView.AppendText(text)
-    break
+    textView:AppendText(text)
 end
+
+mGUI.Place(textView)
+mGUI.Place(textView_1)
 
 os.execute("chcp 65001")
 
@@ -64,12 +82,12 @@ while g_bIsRunning do
         if _event == mInteract.EVENT_QUIT then
             g_bIsRunning = false
         elseif _event == mInteract.EVENT_KEYDOWN_M then
-            TextView.AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
+            textView:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
         end
-        TextView.HandleEvent(_event)
+        mGUI.UpdateEvent(_event)
     end
 
-    TextView.DrawSelf()
+    mGUI.UpdateRender()
 
     mWindow.UpdateWindow()
     
