@@ -1,12 +1,12 @@
 {
-    "entry": "script/Game.lua",
+    "entry": "scripts/Game.lua",
     "package": {
         "path": [
-            "script/?.lua",
-            "module/?.lua"            
+            "scripts/?.lua",
+            "modules/?.lua"            
         ],
         "cpath": [
-            "module/?.dll"
+            "modules/?.dll"
         ]
     },
     "command": [
