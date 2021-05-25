@@ -3,8 +3,9 @@ local _String = UsingModule("String")
 local _Algorithm = UsingModule("Algorithm")
 local _Interactivity = UsingModule("Interactivity")
 
+-- 动态计算滚动条滑块定为矩形
 local function _GetRCSlider(self)
-    return {
+    local _rect = {
         x = self._rcScrollBar.x,
         y = self._rcScrollBar.y + self._rcViewPort.y / (self._nTextHeight * #self._tbText)
             * self._rcScrollBar.h,
@@ -12,8 +13,12 @@ local function _GetRCSlider(self)
         h = self._rcViewPort.h / math.max(self._nTextHeight * #self._tbText, self._rcViewPort.h)
             * self._rcScrollBar.h
     }
+    -- 当文本列表中无文本时修正滑块y坐标
+    if #self._tbText == 0 then _rect.y = self._rcScrollBar.y end
+    return _rect
 end
 
+-- 更新对象内各个定位矩形
 local function _UpdateRects(self)
     self._rcContent = {
         x = self._rcSelf.x,
@@ -96,7 +101,7 @@ return {
                 end
             end
             -- 如果滑块到达底部并且用户没有按下滑块，则移动视口到最底部（滑块滑动至最底）
-            if self._bReachBottom and (not self._bSliderDown) then
+            if _bReachBottom and (not self._bSliderDown) then
                 self._rcViewPort.y = math.max(self._nTextHeight * #self._tbText, self._rcViewPort.h) - self._rcViewPort.h
             end
         end
@@ -202,9 +207,13 @@ return {
                 w = self._rcViewPort.w,
                 h = self._rcViewPort.h
             }
-            for index = 1, self._rcViewPort.y // self._nTextHeight + 1 do
+            -- 记录当前所需要的渲染文本的在列表中的索引
+            local _indexLastRender = #self._tbText
+            -- 销毁当前视口上方不需要的渲染数据
+            for index = 1, self._rcViewPort.y // self._nTextHeight do
                 self._tbRenderedText[index] = nil
             end
+            -- 渲染当前视口内文本数据
             for index = self._rcViewPort.y // self._nTextHeight + 1, #self._tbText do
                 -- 如果已渲染列表中没有当前文本，则渲染此文本
                 if not self._tbRenderedText[index] then
@@ -245,6 +254,7 @@ return {
                         w = self._tbRenderedText[index].width,
                         h = _rectCut.h
                     })
+                    _indexLastRender = index
                     break
                 else
                     _Graphic.CopyTexture(self._tbRenderedText[index].texture, {
@@ -254,6 +264,10 @@ return {
                         h = self._nTextHeight
                     })
                 end
+            end
+            -- 销毁当前视口下方不需要的渲染数据
+            for index = _indexLastRender + 1, #self._tbText do
+                self._tbRenderedText[index] = nil
             end
         end
 
