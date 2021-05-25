@@ -10,7 +10,7 @@ mInteract = UsingModule("Interactivity")
 
 mWindow.CreateWindow("Another World - 未登录", mConfig.RC_WINDOW, {})
 
-mGUI = UsingModule("NiceGUI")
+mGUI = UsingModule("NiceGUI.NiceGUI")
 
 g_bIsRunning = true
 
