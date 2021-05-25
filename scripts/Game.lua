@@ -47,6 +47,8 @@ textList = {
     "【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点",
 }
 
+os.execute("chcp 65001")
+
 textView = mGUI.TextView()
 
 textView:Transform({
@@ -68,8 +70,6 @@ end
 mGUI.Place(textView)
 mGUI.Place(textView_1)
 
-os.execute("chcp 65001")
-
 while g_bIsRunning do
     
     local _nStartTime = mTime.GetInitTime()
@@ -83,6 +83,13 @@ while g_bIsRunning do
             g_bIsRunning = false
         elseif _event == mInteract.EVENT_KEYDOWN_M then
             textView:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
+        elseif _event == mInteract.EVENT_KEYDOWN_C then
+            textView:Transform({
+                x = 200, y = 90,
+                w = 750, h = 600
+            })
+        elseif _event == mInteract.EVENT_KEYDOWN_L then
+            textView:ClearText()
         elseif _event == mInteract.EVENT_KEYDOWN_N then
             textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
         end

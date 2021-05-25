@@ -1,7 +1,42 @@
+--[[
+
+TextView：文本域
+
+Meta:
+    + New
+    + HandleEvent
+    + DrawSelf
+API:
+    + AppendText
+    + ClearText
+    + Transform
+
+--]]
+
 local _Graphic = UsingModule("Graphic")
 local _String = UsingModule("String")
 local _Algorithm = UsingModule("Algorithm")
 local _Interactivity = UsingModule("Interactivity")
+
+local function _CutTextToList(self, str)
+    while true do
+        local _rawStrWidth, _rawStrHeight = _Graphic.GetUTF8TextSize(self._uFont, str)
+        if _rawStrWidth <= self._rcViewPort.w then
+            table.insert(self._tbText, str)
+            break
+        else
+            for index = _String.LenUTF8(str), 1, -1 do
+                local _strTemp = _String.SubStrUTF8(str, 1, index)
+                local _strWidth, _strHeight = _Graphic.GetUTF8TextSize(self._uFont, _strTemp)
+                if _strWidth <= self._rcViewPort.w then
+                    table.insert(self._tbText, _strTemp)
+                    str = _String.SubStrUTF8(str, index + 1)
+                    break
+                end
+            end
+        end
+    end
+end
 
 -- 动态计算滚动条滑块定为矩形
 local function _GetRCSlider(self)
@@ -42,6 +77,14 @@ local function _UpdateRects(self)
     }
 end
 
+local function _UpdateText(self)
+    self._tbText = {}
+    for _, str in ipairs(self._tbRawText) do
+        _CutTextToList(self, str)
+    end
+    self._tbRenderedText = {}
+end
+
 return {
     
     New = function(rect)
@@ -50,7 +93,7 @@ return {
 
         obj._uFont = _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 16)
         obj._nTextHeight = obj._uFont:GetHeight()
-        obj._tbText = {}
+        obj._tbText, obj._tbRawText = {}, {}
         obj._nMargin, obj._nBorder = 10, 5
         obj._nWidthScrollBar = 15
         obj._nPreviousY = 0
@@ -78,33 +121,6 @@ return {
             h = obj._rcSelf.h
         }
         obj._tbRenderedText = {}
-
-        function obj:AppendText(str)
-            -- 通过视口位置判断当前滑块是否到达底部
-            local _bReachBottom = self._rcViewPort.y + self._rcViewPort.h == self._nTextHeight * #self._tbText
-            -- 将过长的字符串分割添加至字符串列表
-            while true do
-                local _rawStrWidth, _rawStrHeight = _Graphic.GetUTF8TextSize(self._uFont, str)
-                if _rawStrWidth <= self._rcViewPort.w then
-                    table.insert(self._tbText, str)
-                    break
-                else
-                    for index = _String.LenUTF8(str), 1, -1 do
-                        local _strTemp = _String.SubStrUTF8(str, 1, index)
-                        local _strWidth, _strHeight = _Graphic.GetUTF8TextSize(self._uFont, _strTemp)
-                        if _strWidth <= self._rcViewPort.w then
-                            table.insert(self._tbText, _strTemp)
-                            str = _String.SubStrUTF8(str, index + 1)
-                            break
-                        end
-                    end
-                end
-            end
-            -- 如果滑块到达底部并且用户没有按下滑块，则移动视口到最底部（滑块滑动至最底）
-            if _bReachBottom and (not self._bSliderDown) then
-                self._rcViewPort.y = math.max(self._nTextHeight * #self._tbText, self._rcViewPort.h) - self._rcViewPort.h
-            end
-        end
 
         function obj:HandleEvent(event)
             if event == _Interactivity.EVENT_MOUSESCROLL then
@@ -271,6 +287,26 @@ return {
             end
         end
 
+        function obj:AppendText(str)
+            -- 存储原始未换行裁剪的字符串
+            table.insert(self._tbRawText, str)
+            -- 通过视口位置判断当前滑块是否到达底部
+            local _bReachBottom = self._rcViewPort.y + self._rcViewPort.h == self._nTextHeight * #self._tbText
+            -- 将的字符串换行分割添加至字符串列表
+            _CutTextToList(self, str)
+            -- 如果滑块到达底部并且用户没有按下滑块，则移动视口到最底部（滑块滑动至最底）
+            if _bReachBottom and (not self._bSliderDown) then
+                self._rcViewPort.y = math.max(self._nTextHeight * #self._tbText, self._rcViewPort.h) - self._rcViewPort.h
+            end
+        end
+
+        function obj:ClearText()
+            self._tbText = {}
+            self._tbRawText = {}
+            _UpdateRects(self)
+            _UpdateText(self)
+        end
+
         function obj:Transform(tb)
             self._rcSelf = {
                 x = tb.x or self._rcSelf.x,
@@ -279,6 +315,7 @@ return {
                 h = tb.h or self._rcSelf.h
             }
             _UpdateRects(self)
+            _UpdateText(self)
         end
 
         return obj
