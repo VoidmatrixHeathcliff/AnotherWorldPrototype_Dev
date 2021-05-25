@@ -97,7 +97,7 @@ return {
         obj._nMargin, obj._nBorder = 10, 5
         obj._nWidthScrollBar = 15
         obj._nPreviousY = 0
-        obj._bSliderDown, obj._bSliderHover = false, false
+        obj._bSliderDown, obj._bSliderHover, obj._bSelfHover = false, false, false
         obj._rcSelf = rect or {
             x = 0, y = 0,
             w = 350, h = 250
@@ -124,15 +124,18 @@ return {
 
         function obj:HandleEvent(event)
             if event == _Interactivity.EVENT_MOUSESCROLL then
-                local _horizontal, _vertical = _Interactivity.GetScrollValue()
-                if self._nTextHeight * #self._tbText > self._rcViewPort.h then
-                    self._rcViewPort.y = _Algorithm.Clamp(
-                        self._rcViewPort.y - _vertical * 15,
-                        0, self._nTextHeight * #self._tbText - self._rcViewPort.h
-                    )
+                if self._bSelfHover then
+                    local _horizontal, _vertical = _Interactivity.GetScrollValue()
+                    if self._nTextHeight * #self._tbText > self._rcViewPort.h then
+                        self._rcViewPort.y = _Algorithm.Clamp(
+                            self._rcViewPort.y - _vertical * 15,
+                            0, self._nTextHeight * #self._tbText - self._rcViewPort.h
+                        )
+                    end
                 end
             elseif event == _Interactivity.EVENT_MOUSEMOTION then
                 self._bSliderHover = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), _GetRCSlider(self))
+                self._bSelfHover = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
                 if self._bSliderDown then
                     local _tbCursorPos = _Interactivity.GetCursorPosition()
                     if self._nTextHeight * #self._tbText > self._rcViewPort.h then

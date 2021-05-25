@@ -1,4 +1,5 @@
 local _TextView = require("NiceGUI.TextView")
+local _Button = require("NiceGUI.Button")
 
 local _tbElements = {}
 
