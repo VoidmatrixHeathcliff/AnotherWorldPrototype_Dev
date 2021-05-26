@@ -62,10 +62,14 @@ textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防
 --     w = 395, h = 600
 -- })
 
+textView:SetHoverCallback(function() print(2) end)
+
 textIndex = 0
 
 button = mGUI.Button({x = 800, y = 500, w = 120, h = 40}, 
     function() button:SetText(textIndex) textIndex = textIndex + 1 end)
+
+button:SetHoverCallback(function() print(1) end)
 
 for _, text in ipairs(textList) do
     textView:AppendText(text)

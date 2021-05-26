@@ -8,6 +8,7 @@ Meta:
 API:
     + AppendText
     + ClearText
+    + SetHoverCallback
     + Transform
 
 --]]
@@ -18,26 +19,6 @@ local _Graphic = UsingModule("Graphic")
 local _String = UsingModule("String")
 local _Algorithm = UsingModule("Algorithm")
 local _Interactivity = UsingModule("Interactivity")
-
-local function _CutTextToList(self, str)
-    while true do
-        local _rawStrWidth, _rawStrHeight = _Graphic.GetUTF8TextSize(self._uFont, str)
-        if _rawStrWidth <= self._rcViewPort.w then
-            table.insert(self._tbText, str)
-            break
-        else
-            for index = _String.LenUTF8(str), 1, -1 do
-                local _strTemp = _String.SubStrUTF8(str, 1, index)
-                local _strWidth, _strHeight = _Graphic.GetUTF8TextSize(self._uFont, _strTemp)
-                if _strWidth <= self._rcViewPort.w then
-                    table.insert(self._tbText, _strTemp)
-                    str = _String.SubStrUTF8(str, index + 1)
-                    break
-                end
-            end
-        end
-    end
-end
 
 -- 动态计算滚动条滑块定为矩形
 local function _GetRCSlider(self)
@@ -81,7 +62,7 @@ end
 local function _UpdateText(self)
     self._tbText = {}
     for _, str in ipairs(self._tbRawText) do
-        _CutTextToList(self, str)
+        _Utils.AppendAdaptedTextToList(self._uFont, str, self._rcViewPort.w, self._tbText)
     end
     self._tbRenderedText = {}
 end
@@ -93,6 +74,7 @@ return {
         obj = {}
 
         obj._uFont = _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 16)
+        obj._fnHoverCallback = function() end
         obj._nTextHeight = obj._uFont:GetHeight()
         obj._tbText, obj._tbRawText = {}, {}
         obj._nMargin, obj._nBorder = 10, 5
@@ -136,7 +118,9 @@ return {
                 end
             elseif event == _Interactivity.EVENT_MOUSEMOTION then
                 self._bSliderHover = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), _GetRCSlider(self))
-                self._bSelfHover = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
+                local _bInArea = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
+                if not self._bSelfHover and _bInArea then self._fnHoverCallback() end
+                self._bSelfHover = _bInArea
                 if self._bSliderDown then
                     local _tbCursorPos = _Interactivity.GetCursorPosition()
                     if self._nTextHeight * #self._tbText > self._rcViewPort.h then
@@ -255,7 +239,7 @@ return {
             -- 通过视口位置判断当前滑块是否到达底部
             local _bReachBottom = self._rcViewPort.y + self._rcViewPort.h >= self._nTextHeight * #self._tbText
             -- 将的字符串换行分割添加至字符串列表
-            _CutTextToList(self, str)
+            _Utils.AppendAdaptedTextToList(self._uFont, str, self._rcViewPort.w, self._tbText)
             -- 如果滑块到达底部并且用户没有按下滑块，则移动视口到最底部（滑块滑动至最底）
             if _bReachBottom and (not self._bSliderDown) then
                 self._rcViewPort.y = math.max(self._nTextHeight * #self._tbText, self._rcViewPort.h) - self._rcViewPort.h
@@ -267,6 +251,10 @@ return {
             self._tbRawText = {}
             _UpdateRects(self)
             _UpdateText(self)
+        end
+
+        function obj:SetHoverCallback(callback)
+            self._fnHoverCallback = callback
         end
 
         function obj:Transform(tb)

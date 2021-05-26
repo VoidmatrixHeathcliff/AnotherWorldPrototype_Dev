@@ -7,7 +7,8 @@ Meta:
     + _DrawSelf
 API:
     + SetText
-    + SetCallback
+    + SetClickCallback
+    + SetHoverCallback
     + Transform
 
 --]]
@@ -32,7 +33,8 @@ return {
         )
         obj._uTextureText = _Graphic.CreateTexture(_image)
         obj._nTextWidth, obj._nTextHeight = _image:GetSize()
-        obj._fnCallback = callback or function() end
+        obj._fnClickCallback = callback or function() end
+        obj._fnHoverCallback = function() end
         obj._bSelfHover, obj._bSelfDown = false, false
         obj._nMarginHorizontal, obj._nMarginVertical = 15, 8
         obj._rcSelf = rect or {
@@ -42,12 +44,14 @@ return {
 
         function obj:_HandleEvent(event)
             if event == _Interactivity.EVENT_MOUSEMOTION then
-                self._bSelfHover = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
+                local _bInArea = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
+                if not self._bSelfHover and _bInArea then self._fnHoverCallback() end
+                self._bSelfHover = _bInArea
             elseif event == _Interactivity.EVENT_MOUSEBTNDOWN_LEFT then
                 self._bSelfDown= _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
             elseif event == _Interactivity.EVENT_MOUSEBTNUP_LEFT then
                 if _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf) then
-                    self._fnCallback()
+                    self._fnClickCallback()
                 end
                 self._bSelfDown= false
             end
@@ -86,8 +90,12 @@ return {
             self._nTextWidth, self._nTextHeight = _image:GetSize()
         end
 
-        function obj:SetCallback(callback)
-            self._fnCallback = callback
+        function obj:SetClickCallback(callback)
+            self._fnClickCallback = callback
+        end
+
+        function obj:SetHoverCallback(callback)
+            self._fnHoverCallback = callback
         end
 
         function obj:Transform(rect)
