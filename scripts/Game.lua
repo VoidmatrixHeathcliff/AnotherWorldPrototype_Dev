@@ -9,7 +9,35 @@ mInteract = UsingModule("Interactivity")
 
 mWindow.CreateWindow("Another World - 未登录", mConfig.RC_WINDOW, {})
 
+-- 引入 NiceGUI 模块
 mGUI = UsingModule("NiceGUI.NiceGUI")
+
+-- -- 创建文本域组件
+-- textView = mGUI.TextView()
+
+-- -- 调整文本域组件的位置和尺寸
+-- textView:Transform({
+--     x = 200, y = 90,
+--     w = 500, h = 600
+-- })
+
+-- -- 向文本域中添加字符串
+-- textView:AppendText("【小刚】装备【守护者之盾】")
+
+-- -- 将创建的文本域组件添加到界面中
+-- mGUI.Place(textView)
+
+-- -- 主循环
+-- while true do
+--     -- 更新获取事件
+--     while mInteract.UpdateEvent() do
+--         local _event = mInteract.GetEventType()
+--         -- 更新 GUI 组件事件
+--         mGUI.UpdateEvent(_event)
+--     end
+--     -- 更新 GUI 组件渲染
+--     mGUI.UpdateRender()
+-- end
 
 g_bIsRunning = true
 
@@ -48,6 +76,16 @@ textList = {
 
 os.execute("chcp 65001")
 
+-- local resultStrList = {}
+--     -- string.gsub("这是\n中文字符\n中间添加了换行符\n测试\n",'[^\n]+',function ( w )
+--     --     table.insert(resultStrList,w)
+--     -- end)
+--     for match in string.gmatch("这是\n中文字符\n中间添加了换行符\n测试\n\n", "(.-)\n") do
+--         table.insert(resultStrList, match)
+--     end 
+-- for _, str in ipairs(resultStrList) do print(str) end
+-- print(#resultStrList)
+
 textView = mGUI.TextView()
 
 textView:Transform({
@@ -56,20 +94,20 @@ textView:Transform({
 })
 
 textView_1 = mGUI.TextView()
-textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
+-- textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
 -- textView_1:Transform({
 --     x = 650, y = 90,
 --     w = 395, h = 600
 -- })
 
-textView:SetHoverCallback(function() print(2) end)
+-- textView:SetHoverCallback(function() print(2) end)
 
 textIndex = 0
 
 button = mGUI.Button({x = 800, y = 500, w = 120, h = 40}, 
     function() button:SetText(textIndex) textIndex = textIndex + 1 end)
 
-button:SetHoverCallback(function() print(1) end)
+-- button:SetHoverCallback(function() print(1) end)
 
 for _, text in ipairs(textList) do
     textView:AppendText(text)
@@ -92,7 +130,7 @@ while g_bIsRunning do
         if _event == mInteract.EVENT_QUIT then
             g_bIsRunning = false
         elseif _event == mInteract.EVENT_KEYDOWN_M then
-            textView:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
+            textView:AppendText("【小刚】\n装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
         elseif _event == mInteract.EVENT_KEYDOWN_C then
             textView:Transform({
                 x = 200, y = 90,

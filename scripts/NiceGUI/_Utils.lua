@@ -29,23 +29,25 @@ return {
     end,
 
     AppendAdaptedTextToList = function(font, str, width, list)
-        while true do
-            local _rawStrWidth, _rawStrHeight = _Graphic.GetUTF8TextSize(font, str)
-            if _rawStrWidth <= width then
-                table.insert(list, str)
-                break
-            else
-                for index = _String.LenUTF8(str), 1, -1 do
-                    local _strTemp = _String.SubStrUTF8(str, 1, index)
-                    local _strWidth, _strHeight = _Graphic.GetUTF8TextSize(font, _strTemp)
-                    if _strWidth <= width then
-                        table.insert(list, _strTemp)
-                        str = _String.SubStrUTF8(str, index + 1)
-                        break
+        string.gsub(str, '[^\n]+', function (strFragment)
+            while true do
+                local _rawStrWidth, _rawStrHeight = _Graphic.GetUTF8TextSize(font, strFragment)
+                if _rawStrWidth <= width then
+                    table.insert(list, strFragment)
+                    break
+                else
+                    for index = _String.LenUTF8(strFragment), 1, -1 do
+                        local _strTemp = _String.SubStrUTF8(strFragment, 1, index)
+                        local _strWidth, _strHeight = _Graphic.GetUTF8TextSize(font, _strTemp)
+                        if _strWidth <= width then
+                            table.insert(list, _strTemp)
+                            strFragment = _String.SubStrUTF8(strFragment, index + 1)
+                            break
+                        end
                     end
                 end
             end
-        end
+        end)
     end
 
 }

@@ -80,7 +80,8 @@ return {
         obj._nMargin, obj._nBorder = 10, 5
         obj._nWidthScrollBar = 15
         obj._nPreviousY = 0
-        obj._bSliderDown, obj._bSliderHover, obj._bSelfHover = false, false, false
+        obj._bSliderDown, obj._bSliderHover = false, false
+        obj._bSelfHover = false
         obj._rcSelf = rect or {
             x = 0, y = 0,
             w = 350, h = 250
