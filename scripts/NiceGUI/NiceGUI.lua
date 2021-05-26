@@ -7,13 +7,13 @@ return {
 
     UpdateEvent = function(event)
         for _, ele in pairs(_tbElements) do
-            if ele then ele:HandleEvent(event) end
+            if ele then ele:_HandleEvent(event) end
         end
     end,
 
     UpdateRender = function()
         for _, ele in pairs(_tbElements) do
-            if ele then ele:DrawSelf() end
+            if ele then ele:_DrawSelf() end
         end
     end,
 
@@ -34,6 +34,10 @@ return {
 
     TextView = function(rect)
         return _TextView.New(rect)
+    end,
+
+    Button = function(rect, callback)
+        return _Button.New(rect, callback)
     end,
 
 }

@@ -3,9 +3,8 @@
 TextView：文本域
 
 Meta:
-    + New
-    + HandleEvent
-    + DrawSelf
+    + _HandleEvent
+    + _DrawSelf
 API:
     + AppendText
     + ClearText
@@ -122,7 +121,7 @@ return {
         }
         obj._tbRenderedText = {}
 
-        function obj:HandleEvent(event)
+        function obj:_HandleEvent(event)
             if event == _Interactivity.EVENT_MOUSESCROLL then
                 if self._bSelfHover then
                     local _horizontal, _vertical = _Interactivity.GetScrollValue()
@@ -157,7 +156,7 @@ return {
             end
         end
 
-        function obj:DrawSelf()
+        function obj:_DrawSelf()
             -- 绘制文本区域底色
             _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
             _Graphic.FillRectangle(self._rcContent)
@@ -195,7 +194,7 @@ return {
             else
                 _Graphic.SetDrawColor({r = 185, g = 185, b = 185, a = 255})
             end
-            _Graphic.FillRectangle(_GetRCSlider(self), 5)
+            _Graphic.FillRectangle(_GetRCSlider(self))
             -- 绘制侧边滚动条边框线
             _Graphic.SetDrawColor({r = 215, g = 215, b = 215, a = 255})
             _Graphic.ThickLine(
@@ -294,7 +293,7 @@ return {
             -- 存储原始未换行裁剪的字符串
             table.insert(self._tbRawText, str)
             -- 通过视口位置判断当前滑块是否到达底部
-            local _bReachBottom = self._rcViewPort.y + self._rcViewPort.h == self._nTextHeight * #self._tbText
+            local _bReachBottom = self._rcViewPort.y + self._rcViewPort.h >= self._nTextHeight * #self._tbText
             -- 将的字符串换行分割添加至字符串列表
             _CutTextToList(self, str)
             -- 如果滑块到达底部并且用户没有按下滑块，则移动视口到最底部（滑块滑动至最底）
