@@ -6,11 +6,13 @@ Meta:
     + _HandleEvent
     + _DrawSelf
 API:
-    + AppendText
-    + ClearText
+    + SetText
+    + SetCallback
     + Transform
 
 --]]
+
+local _Utils = UsingModule("NiceGUI._Utils")
 
 local _Graphic = UsingModule("Graphic")
 local _Algorithm = UsingModule("Algorithm")
@@ -62,28 +64,7 @@ return {
             end
             _Graphic.FillRectangle(self._rcSelf)
             -- 绘制立体边框线
-            _Graphic.SetDrawColor({r = 215, g = 215, b = 215, a = 255})
-            _Graphic.ThickLine(
-                {x = self._rcSelf.x, y = self._rcSelf.y},
-                {x = self._rcSelf.x, y = self._rcSelf.y + self._rcSelf.h},
-                2
-            )
-            _Graphic.ThickLine(
-                {x = self._rcSelf.x, y = self._rcSelf.y},
-                {x = self._rcSelf.x + self._rcSelf.w, y = self._rcSelf.y},
-                2
-            )
-            _Graphic.SetDrawColor({r = 135, g = 135, b = 135, a = 255})
-            _Graphic.ThickLine(
-                {x = self._rcSelf.x, y = self._rcSelf.y + self._rcSelf.h},
-                {x = self._rcSelf.x + self._rcSelf.w, y = self._rcSelf.y + self._rcSelf.h},
-                2
-            )
-            _Graphic.ThickLine(
-                {x = self._rcSelf.x + self._rcSelf.w, y = self._rcSelf.y},
-                {x = self._rcSelf.x + self._rcSelf.w, y = self._rcSelf.y + self._rcSelf.h},
-                2
-            )
+            _Utils.DrawRectSolidBorder(self._rcSelf, 2)
             -- 绘制文本内容
             local _nMinWidth, _nMinHeight = 
                 math.min(self._rcSelf.w - self._nMarginHorizontal * 2, self._nTextWidth),
@@ -107,6 +88,10 @@ return {
 
         function obj:SetCallback(callback)
             self._fnCallback = callback
+        end
+
+        function obj:Transform(rect)
+            self._rcSelf = rect
         end
 
         return obj

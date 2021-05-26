@@ -12,6 +12,8 @@ API:
 
 --]]
 
+local _Utils = UsingModule("NiceGUI._Utils")
+
 local _Graphic = UsingModule("Graphic")
 local _String = UsingModule("String")
 local _Algorithm = UsingModule("Algorithm")
@@ -161,28 +163,7 @@ return {
             _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
             _Graphic.FillRectangle(self._rcContent)
             -- 绘制文本区域立体边框线
-            _Graphic.SetDrawColor({r = 215, g = 215, b = 215, a = 255})
-            _Graphic.ThickLine(
-                {x = self._rcContent.x, y = self._rcContent.y},
-                {x = self._rcContent.x, y = self._rcContent.y + self._rcContent.h},
-                2
-            )
-            _Graphic.ThickLine(
-                {x = self._rcContent.x, y = self._rcContent.y},
-                {x = self._rcContent.x + self._rcContent.w, y = self._rcContent.y},
-                2
-            )
-            _Graphic.SetDrawColor({r = 135, g = 135, b = 135, a = 255})
-            _Graphic.ThickLine(
-                {x = self._rcContent.x, y = self._rcContent.y + self._rcContent.h},
-                {x = self._rcContent.x + self._rcContent.w, y = self._rcContent.y + self._rcContent.h},
-                2
-            )
-            _Graphic.ThickLine(
-                {x = self._rcContent.x + self._rcContent.w, y = self._rcContent.y},
-                {x = self._rcContent.x + self._rcContent.w, y = self._rcContent.y + self._rcContent.h},
-                2
-            )
+            _Utils.DrawRectSolidBorder(self._rcContent, 2)
             -- 绘制侧边滚动条底色
             _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
             _Graphic.FillRectangle(self._rcScrollBar)
@@ -196,28 +177,7 @@ return {
             end
             _Graphic.FillRectangle(_GetRCSlider(self))
             -- 绘制侧边滚动条边框线
-            _Graphic.SetDrawColor({r = 215, g = 215, b = 215, a = 255})
-            _Graphic.ThickLine(
-                {x = self._rcScrollBar.x, y = self._rcScrollBar.y},
-                {x = self._rcScrollBar.x, y = self._rcScrollBar.y + self._rcScrollBar.h},
-                2
-            )
-            _Graphic.ThickLine(
-                {x = self._rcScrollBar.x, y = self._rcScrollBar.y},
-                {x = self._rcScrollBar.x + self._rcScrollBar.w, y = self._rcScrollBar.y},
-                2
-            )
-            _Graphic.SetDrawColor({r = 135, g = 135, b = 135, a = 255})
-            _Graphic.ThickLine(
-                {x = self._rcScrollBar.x, y = self._rcScrollBar.y + self._rcScrollBar.h},
-                {x = self._rcScrollBar.x + self._rcScrollBar.w, y = self._rcScrollBar.y + self._rcScrollBar.h},
-                2
-            )
-            _Graphic.ThickLine(
-                {x = self._rcScrollBar.x + self._rcScrollBar.w, y = self._rcScrollBar.y},
-                {x = self._rcScrollBar.x + self._rcScrollBar.w, y = self._rcScrollBar.y + self._rcScrollBar.h},
-                2
-            )
+            _Utils.DrawRectSolidBorder(self._rcScrollBar, 2)
             -- 绘制文本内容
             local _rcCopyDst = {
                 x = self._rcContent.x + self._nMargin,
