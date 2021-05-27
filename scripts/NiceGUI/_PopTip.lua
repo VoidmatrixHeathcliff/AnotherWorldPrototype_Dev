@@ -1,14 +1,12 @@
 --[[
 
-TextView：文本域
+PopTip：弹出式提示框
 
 Meta:
-    + _HandleEvent
+    + _Show
+    + _Hide
     + _DrawSelf
 API:
-    + SetText
-    + SetEnable
-    + SetTextColor
 
 --]]
 
@@ -56,6 +54,10 @@ return {
         end
     end,
 
+    _Hide = function()
+        _bSelfEnable = false
+    end,
+
     _DrawSelf = function()
         if _bSelfEnable then
             local _widthWindow, _heightWindow = _Window.GetWindowSize()
@@ -97,9 +99,5 @@ return {
             end
         end
     end,
-
-    _Hide = function()
-        _bSelfEnable = false
-    end
 
 }
