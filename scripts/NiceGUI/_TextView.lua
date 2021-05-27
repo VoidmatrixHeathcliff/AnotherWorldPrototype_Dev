@@ -9,6 +9,7 @@ API:
     + AppendText
     + ClearText
     + SetHoverCallback
+    + SetSliderEnable
     + Transform
 
 --]]
@@ -81,6 +82,7 @@ return {
         obj._nWidthScrollBar = 15
         obj._nPreviousY = 0
         obj._bSliderDown, obj._bSliderHover = false, false
+        obj._bSliderEnable = true
         obj._bSelfHover = false
         obj._rcSelf = rect or {
             x = 0, y = 0,
@@ -141,6 +143,7 @@ return {
             elseif event == _Interactivity.EVENT_MOUSEBTNUP_LEFT then
                 self._bSliderDown = false
             end
+            if not self._bSliderEnable then self._bSliderHover, self._bSliderDown = false, false end
         end
 
         function obj:_DrawSelf()
@@ -163,6 +166,11 @@ return {
             _Graphic.FillRectangle(_GetRCSlider(self))
             -- 绘制侧边滚动条边框线
             _Utils.DrawRectSolidBorder(self._rcScrollBar, 2)
+            -- 如果滑块状态为禁用则绘制蒙版
+            if not self._bSliderEnable then 
+                _Graphic.SetDrawColor({r = 185, g = 185, b = 185, a = 120})
+                _Graphic.FillRectangle(self._rcScrollBar)
+            end
             -- 绘制文本内容
             local _rcCopyDst = {
                 x = self._rcContent.x + self._nMargin,
@@ -256,6 +264,10 @@ return {
 
         function obj:SetHoverCallback(callback)
             self._fnHoverCallback = callback
+        end
+
+        function obj:SetSliderEnable(flag)
+            self._bSliderEnable = flag
         end
 
         function obj:Transform(tb)

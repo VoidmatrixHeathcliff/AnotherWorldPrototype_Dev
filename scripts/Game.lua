@@ -88,11 +88,6 @@ os.execute("chcp 65001")
 
 textView = mGUI.TextView()
 
-textView:Transform({
-    x = 200, y = 90,
-    w = 500, h = 600
-})
-
 textView_1 = mGUI.TextView()
 -- textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
 -- textView_1:Transform({
@@ -104,8 +99,10 @@ textView_1 = mGUI.TextView()
 
 textIndex = 0
 
-button = mGUI.Button({x = 800, y = 500, w = 120, h = 40}, 
-    function() button:SetText(textIndex) textIndex = textIndex + 1 end)
+-- bIsEnable = false
+
+button = mGUI.Button({x = 800, y = 500, w = 120, h = 40}, "Button", 
+    function() textView:SetSliderEnable(false) end)
 
 -- button:SetHoverCallback(function() print(1) end)
 
@@ -113,6 +110,12 @@ for _, text in ipairs(textList) do
     textView:AppendText(text)
     break
 end
+
+textView:Transform({
+    x = 200, y = 90,
+    w = 500, h = 600
+})
+
 
 mGUI.Place(textView)
 mGUI.Place(button)
