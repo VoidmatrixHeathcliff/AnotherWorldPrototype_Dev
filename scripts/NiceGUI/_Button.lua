@@ -42,15 +42,23 @@ return {
         obj._uTextureText = _Graphic.CreateTexture(_image)
         obj._nTextWidth, obj._nTextHeight = _image:GetSize()
         obj._fnClickCallback = values.onClick or function() end
-        obj._fnEnterCallback = function() end
-        obj._fnLeaveCallback = function() end
+        obj._fnEnterCallback = values.onEnter or function() end
+        obj._fnLeaveCallback = values.onLeave or function() end
         obj._bSelfHover, obj._bSelfDown = false, false
         obj._bSelfEnable = true
         obj._nMarginHorizontal, obj._nMarginVertical = 15, 8
-        obj._rcSelf = values.rect or {
+        obj._rcSelf = {
             x = 0, y = 0,
             w = 150, h = 85
         }
+        if values.rect then
+            obj._rcSelf = {
+                x = values.rect.x or obj._rcSelf.x,
+                y = values.rect.y or obj._rcSelf.y,
+                w = values.rect.w or obj._rcSelf.w,
+                h = values.rect.h or obj._rcSelf.h,
+            }
+        end
 
         function obj:_HandleEvent(event)
             if event == _Interactivity.EVENT_MOUSEMOTION then
@@ -136,7 +144,12 @@ return {
         end
 
         function obj:Transform(rect)
-            self._rcSelf = rect
+            self._rcSelf = {
+                x = rect.x or self._rcSelf.x,
+                y = rect.y or self._rcSelf.y,
+                w = rect.w or self._rcSelf.w,
+                h = rect.h or self._rcSelf.h,
+            }
         end
 
         return obj

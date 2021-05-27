@@ -71,13 +71,15 @@ end
 
 return {
     
-    _New = function(rect)
+    _New = function(values)
+
+        assert(values)
 
         obj = {}
 
-        obj._uFont = _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 16)
-        obj._fnEnterCallback = function() end
-        obj._fnLeaveCallback = function() end
+        obj._uFont = values.font or _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 16)
+        obj._fnEnterCallback = values.onEnter or function() end
+        obj._fnLeaveCallback = values.onLeave or function() end
         obj._nTextHeight = obj._uFont:GetHeight()
         obj._tbText, obj._tbRawText = {}, {}
         obj._nMargin, obj._nBorder = 10, 5
@@ -86,10 +88,18 @@ return {
         obj._bSliderDown, obj._bSliderHover = false, false
         obj._bSliderEnable = true
         obj._bSelfHover = false
-        obj._rcSelf = rect or {
+        obj._rcSelf = {
             x = 0, y = 0,
             w = 350, h = 250
         }
+        if values.rect then
+            obj._rcSelf = {
+                x = values.rect.x or obj._rcSelf.x,
+                y = values.rect.y or obj._rcSelf.y,
+                w = values.rect.w or obj._rcSelf.w,
+                h = values.rect.h or obj._rcSelf.h,
+            }
+        end
         obj._rcContent = {
             x = obj._rcSelf.x,
             y = obj._rcSelf.y,
@@ -283,12 +293,12 @@ return {
             self._bSliderEnable = flag
         end
 
-        function obj:Transform(tb)
+        function obj:Transform(rect)
             self._rcSelf = {
-                x = tb.x or self._rcSelf.x,
-                y = tb.y or self._rcSelf.y,
-                w = tb.w or self._rcSelf.w,
-                h = tb.h or self._rcSelf.h
+                x = rect.x or self._rcSelf.x,
+                y = rect.y or self._rcSelf.y,
+                w = rect.w or self._rcSelf.w,
+                h = rect.h or self._rcSelf.h,
             }
             _UpdateRects(self)
             _UpdateText(self)

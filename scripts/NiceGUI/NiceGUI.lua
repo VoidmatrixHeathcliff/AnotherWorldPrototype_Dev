@@ -34,8 +34,8 @@ return {
         _tbElements = {}
     end,
 
-    TextView = function(rect)
-        return _TextView._New(rect)
+    TextView = function(values)
+        return _TextView._New(values)
     end,
 
     Button = function(values)

@@ -86,7 +86,7 @@ os.execute("chcp 65001")
 -- for _, str in ipairs(resultStrList) do print(str) end
 -- print(#resultStrList)
 
-textView = mGUI.TextView()
+textView = mGUI.TextView({})
 
 -- textView_1 = mGUI.TextView()
 -- textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")

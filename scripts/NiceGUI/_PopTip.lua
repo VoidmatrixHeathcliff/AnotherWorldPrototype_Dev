@@ -31,11 +31,14 @@ local _rcSelf = {x = 0, y = 0, w = 0, h = 0}
 return {
 
     _Show = function(values)
+
         assert(values)
+        
         _bSelfEnable = true
         values.text = values.text or _strText
         _clrText = values.color or _clrText
         _uFont = values.font or _uFont
+        _nTextHeight = _uFont:GetHeight()
         if values.text ~= _strText then
             _strText = values.text
             _tbRenderedText = {}
