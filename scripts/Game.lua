@@ -101,17 +101,17 @@ textIndex = 0
 
 bIsEnable = false
 
-button = mGUI.Button({x = 800, y = 500, w = 180, h = 40}, "显示提示信息", 
-    function()
+button = mGUI.Button({rect = {x = 800, y = 500, w = 180, h = 40}, text = "显示提示信息", 
+    onClick = function()
         bIsEnable = not bIsEnable
         if bIsEnable then
             button:SetText("隐藏提示信息")
-            mGUI.ShowPopTip("这是一句提示信息\n这是第二行提示信息可能吧？") 
+            mGUI.ShowPopTip({text = "这是一句提示信息\n这是第二行提示信息可能吧？"}) 
         else
             button:SetText("显示提示信息")
             mGUI.HidePopTip()
         end
-    end)
+    end})
 
 -- button:SetEnterCallback(function() mGUI.ShowPopTip() end)
 -- button:SetLeaveCallback(function() mGUI.HidePopTip() end)

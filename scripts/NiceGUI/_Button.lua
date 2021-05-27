@@ -3,6 +3,10 @@
 Button：按钮
 
 Meta:
+    + _New
+        - rect
+        - font
+        - onClick
     + _HandleEvent
     + _DrawSelf
 API:
@@ -23,25 +27,27 @@ local _Interactivity = UsingModule("Interactivity")
 
 return {
 
-    _New = function(rect, text, callback)
+    _New = function(values)
         
+        assert(values)
+
         obj = {}
 
-        obj._uFont = _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 18)
-        obj._strText = text or "按 钮"
+        obj._uFont = values.font or _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 18)
+        obj._strText = values.text or "按 钮"
         local _image = _Graphic.CreateUTF8TextImageBlended(
             obj._uFont, obj._strText,
             {r = 25, g = 25, b = 25, a = 255}
         )
         obj._uTextureText = _Graphic.CreateTexture(_image)
         obj._nTextWidth, obj._nTextHeight = _image:GetSize()
-        obj._fnClickCallback = callback or function() end
+        obj._fnClickCallback = values.onClick or function() end
         obj._fnEnterCallback = function() end
         obj._fnLeaveCallback = function() end
         obj._bSelfHover, obj._bSelfDown = false, false
         obj._bSelfEnable = true
         obj._nMarginHorizontal, obj._nMarginVertical = 15, 8
-        obj._rcSelf = rect or {
+        obj._rcSelf = values.rect or {
             x = 0, y = 0,
             w = 150, h = 85
         }

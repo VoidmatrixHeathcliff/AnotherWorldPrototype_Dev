@@ -38,12 +38,12 @@ return {
         return _TextView._New(rect)
     end,
 
-    Button = function(rect, text, callback)
-        return _Button._New(rect, text, callback)
+    Button = function(values)
+        return _Button._New(values)
     end,
 
-    ShowPopTip = function(text, color)
-        return _PopTip._Show(text, color)
+    ShowPopTip = function(values)
+        _PopTip._Show(values)
     end,
 
     HidePopTip = function()

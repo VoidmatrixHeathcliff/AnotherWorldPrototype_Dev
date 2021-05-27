@@ -4,6 +4,9 @@ PopTip：弹出式提示框
 
 Meta:
     + _Show
+        - font
+        - text
+        - color
     + _Hide
     + _DrawSelf
 API:
@@ -27,12 +30,14 @@ local _rcSelf = {x = 0, y = 0, w = 0, h = 0}
 
 return {
 
-    _Show = function(text, color)
+    _Show = function(values)
+        assert(values)
         _bSelfEnable = true
-        text = text or "提示信息"
-        _clrText = color or {r = 246, g = 173, b = 73, a = 255}
-        if text ~= _strText then
-            _strText = text
+        values.text = values.text or _strText
+        _clrText = values.color or _clrText
+        _uFont = values.font or _uFont
+        if values.text ~= _strText then
+            _strText = values.text
             _tbRenderedText = {}
             -- 根据换行符裁剪字符串并将其渲染数据保存到表中
             local _nMaxWidth = 0
@@ -81,14 +86,14 @@ return {
 
             -- 绘制气泡边框和底色
             _Graphic.SetDrawColor({r = 215, g = 215, b = 215, a = 255})
-            _Graphic.FillRoundRectangle(_rcSelf, 5)
+            _Graphic.FillRoundRectangle(_rcSelf, 8)
             _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
             _Graphic.FillRoundRectangle({
                 x = _rcSelf.x + 2,
                 y = _rcSelf.y + 2,
                 w = _rcSelf.w - 4,
                 h = _rcSelf.h - 4
-            }, 5)
+            }, 8)
             -- 绘制文本
             for index, data in pairs(_tbRenderedText) do
                 _Graphic.CopyTexture(data.texture, {
