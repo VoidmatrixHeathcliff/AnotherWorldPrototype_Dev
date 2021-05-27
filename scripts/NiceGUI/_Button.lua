@@ -9,7 +9,8 @@ API:
     + SetText
     + SetEnable
     + SetClickCallback
-    + SetHoverCallback
+    + SetEnterCallback
+    + SetLeaveCallback
     + Transform
 
 --]]
@@ -22,7 +23,7 @@ local _Interactivity = UsingModule("Interactivity")
 
 return {
 
-    New = function(rect, text, callback)
+    _New = function(rect, text, callback)
         
         obj = {}
 
@@ -35,7 +36,8 @@ return {
         obj._uTextureText = _Graphic.CreateTexture(_image)
         obj._nTextWidth, obj._nTextHeight = _image:GetSize()
         obj._fnClickCallback = callback or function() end
-        obj._fnHoverCallback = function() end
+        obj._fnEnterCallback = function() end
+        obj._fnLeaveCallback = function() end
         obj._bSelfHover, obj._bSelfDown = false, false
         obj._bSelfEnable = true
         obj._nMarginHorizontal, obj._nMarginVertical = 15, 8
@@ -46,13 +48,26 @@ return {
 
         function obj:_HandleEvent(event)
             if event == _Interactivity.EVENT_MOUSEMOTION then
-                local _bInArea = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
-                if self._bSelfEnable and not self._bSelfHover and _bInArea then self._fnHoverCallback() end
-                self._bSelfHover = _bInArea
+                if self._bSelfEnable then
+                    local _bInArea = _Algorithm.CheckPointInRect(
+                        _Interactivity.GetCursorPosition(), self._rcSelf)
+                    if _bInArea then
+                        if not self._bSelfHover then
+                            self._fnEnterCallback()
+                        end
+                    elseif self._bSelfHover then
+                        self._fnLeaveCallback()
+                    end
+                    self._bSelfHover = _bInArea
+                else
+                    self._bSelfHover = false
+                end
             elseif event == _Interactivity.EVENT_MOUSEBTNDOWN_LEFT then
-                self._bSelfDown= _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
+                self._bSelfDown = _Algorithm.CheckPointInRect(
+                    _Interactivity.GetCursorPosition(), self._rcSelf)
             elseif event == _Interactivity.EVENT_MOUSEBTNUP_LEFT then
-                if self._bSelfEnable and _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf) then
+                if self._bSelfEnable and _Algorithm.CheckPointInRect(
+                    _Interactivity.GetCursorPosition(), self._rcSelf) then
                     self._fnClickCallback()
                 end
                 self._bSelfDown= false
@@ -106,8 +121,12 @@ return {
             self._fnClickCallback = callback
         end
 
-        function obj:SetHoverCallback(callback)
-            self._fnHoverCallback = callback
+        function obj:SetEnterCallback(callback)
+            self._fnEnterCallback = callback
+        end
+
+        function obj:SetLeaveCallback(callback)
+            self._fnLeaveCallback = callback
         end
 
         function obj:Transform(rect)

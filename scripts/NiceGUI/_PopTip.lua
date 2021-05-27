@@ -12,43 +12,94 @@ API:
 
 --]]
 
+local _Window = UsingModule("Window")
+local _Graphic = UsingModule("Graphic")
+local _Interactivity = UsingModule("Interactivity")
+
+local _tbActiveObjList = {}
+
+local _uFont = _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 15)
+local _nTextHeight = _uFont:GetHeight()
+local _nMargin, _nOffset = 10, 10
+local _bSelfEnable = false
+local _strText = "提示信息"
+local _clrText = {r = 246, g = 173, b = 73, a = 255}
+local _tbRenderedText = {}
+local _rcSelf = {x = 0, y = 0, w = 0, h = 0}
+
 return {
 
-    New = function(text, color)
-
-        obj = {}
-
-        obj._uFont = _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 18)
-        obj._nTextHeight = obj._uFont:GetHeight()
-        obj._nMargin = 10
-        obj._strText = text or "提示信息"
-        obj._clrText = color or {r = 66, g = 101, b = 121, a = 255}
-        obj._tbRenderedText = {}
-        -- 根据换行符裁剪字符串并将其渲染数据保存到表中
-        string.gsub(str, '[^\n]+', function (strFragment)
-            local _image = _Graphic.CreateUTF8TextImageBlended(
-                obj._uFont, strFragment,obj._clrText)
-            local _width, _height = _image:GetSize()
-            table.insert(obj._tbRenderedText, {
-                texture = _Graphic.CreateTexture(_image),
-                width = _width
-            })
-        end)
-        -- 遍历求得长度最长的纹理
-        local _nMaxWidth = obj._tbRenderedText[1].width
-        for _, data in pairs(obj._tbRenderedText) do
-            _nMaxWidth = math.max(_nMaxWidth, data.width)
+    _Show = function(text, color)
+        _bSelfEnable = true
+        text = text or "提示信息"
+        _clrText = color or {r = 246, g = 173, b = 73, a = 255}
+        if text ~= _strText then
+            _strText = text
+            _tbRenderedText = {}
+            -- 根据换行符裁剪字符串并将其渲染数据保存到表中
+            local _nMaxWidth = 0
+            string.gsub(_strText, '[^\n]+', function (strFragment)
+                local _image = _Graphic.CreateUTF8TextImageBlended(
+                    _uFont, strFragment, _clrText)
+                local _width, _height = _image:GetSize()
+                _nMaxWidth = math.max(_nMaxWidth, _width)
+                table.insert(_tbRenderedText, {
+                    texture = _Graphic.CreateTexture(_image),
+                    width = _width
+                })
+            end)
+            _rcSelf = {
+                x = 0, y = 0,
+                w = _nMaxWidth + _nMargin * 2,
+                h = #_tbRenderedText * _nTextHeight + _nMargin * 2
+            }
         end
-        obj._rcSelf = {
-            x = 0, y = 0,
-            w = _nMaxWidth + obj._nMargin * 2,
-            h = #obj._tbRenderedText * obj._nTextHeight + obj._nMargin * 2
-        }
+    end,
 
-        function obj:_DrawSelf()
+    _DrawSelf = function()
+        if _bSelfEnable then
+            local _widthWindow, _heightWindow = _Window.GetWindowSize()
+            local _tbCursorPos = _Interactivity.GetCursorPosition()
             
-        end
+            if _tbCursorPos.x + _nOffset + _rcSelf.w <= _widthWindow 
+                and _tbCursorPos.y + _nOffset + _rcSelf.h <= _heightWindow then
+                _rcSelf.x, _rcSelf.y = _tbCursorPos.x + _nOffset, _tbCursorPos.y + _nOffset
+            elseif _tbCursorPos.x - _nOffset - _rcSelf.w >= 0
+                and _tbCursorPos.y + _nOffset + _rcSelf.h <= _heightWindow then
+                _rcSelf.x, _rcSelf.y = _tbCursorPos.x - _rcSelf.w - _nOffset, _tbCursorPos.y + _nOffset
+            elseif _tbCursorPos.x + _nOffset + _rcSelf.w <= _widthWindow
+                and _tbCursorPos.y - _nOffset - _rcSelf.h >= 0 then
+                _rcSelf.x, _rcSelf.y = _tbCursorPos.x + _nOffset, _tbCursorPos.y - _rcSelf.h - _nOffset
+            elseif _tbCursorPos.x - _nOffset - _rcSelf.w >= 0
+                and _tbCursorPos.y - _nOffset - _rcSelf.h >= 0 then
+                _rcSelf.x, _rcSelf.y = _tbCursorPos.x - _rcSelf.w - _nOffset, _tbCursorPos.y - _rcSelf.h - _nOffset
+            else
+                _rcSelf.x, _rcSelf.y = _tbCursorPos.x + _nOffset, _tbCursorPos.y + _nOffset
+            end
 
+            -- 绘制气泡边框和底色
+            _Graphic.SetDrawColor({r = 215, g = 215, b = 215, a = 255})
+            _Graphic.FillRoundRectangle(_rcSelf, 5)
+            _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
+            _Graphic.FillRoundRectangle({
+                x = _rcSelf.x + 2,
+                y = _rcSelf.y + 2,
+                w = _rcSelf.w - 4,
+                h = _rcSelf.h - 4
+            }, 5)
+            -- 绘制文本
+            for index, data in pairs(_tbRenderedText) do
+                _Graphic.CopyTexture(data.texture, {
+                    x = _rcSelf.x + _nMargin,
+                    y = _rcSelf.y + _nMargin + _nTextHeight * (index - 1),
+                    w = data.width, h = _nTextHeight
+                })
+            end
+        end
+    end,
+
+    _Hide = function()
+        _bSelfEnable = false
     end
 
 }

@@ -1,5 +1,6 @@
-local _TextView = require("NiceGUI._TextView")
-local _Button = require("NiceGUI._Button")
+local _TextView = UsingModule("NiceGUI._TextView")
+local _Button = UsingModule("NiceGUI._Button")
+local _PopTip = UsingModule("NiceGUI._PopTip")
 
 local _tbElements = {}
 
@@ -15,6 +16,7 @@ return {
         for _, ele in pairs(_tbElements) do
             if ele then ele:_DrawSelf() end
         end
+        _PopTip._DrawSelf()
     end,
 
     Place = function(obj)
@@ -33,11 +35,19 @@ return {
     end,
 
     TextView = function(rect)
-        return _TextView.New(rect)
+        return _TextView._New(rect)
     end,
 
-    Button = function(rect, callback)
-        return _Button.New(rect, callback)
+    Button = function(rect, text, callback)
+        return _Button._New(rect, text, callback)
+    end,
+
+    ShowPopTip = function(text, color)
+        return _PopTip._Show(text, color)
+    end,
+
+    HidePopTip = function()
+        _PopTip._Hide()
     end,
 
 }

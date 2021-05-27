@@ -1,6 +1,6 @@
 --[[
 
-TextView：文本域
+TextView：文本列表
 
 Meta:
     + _HandleEvent
@@ -8,7 +8,8 @@ Meta:
 API:
     + AppendText
     + ClearText
-    + SetHoverCallback
+    + SetEnterCallback
+    + SetLeaveCallback
     + SetSliderEnable
     + Transform
 
@@ -70,12 +71,13 @@ end
 
 return {
     
-    New = function(rect)
+    _New = function(rect)
 
         obj = {}
 
         obj._uFont = _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 16)
-        obj._fnHoverCallback = function() end
+        obj._fnEnterCallback = function() end
+        obj._fnLeaveCallback = function() end
         obj._nTextHeight = obj._uFont:GetHeight()
         obj._tbText, obj._tbRawText = {}, {}
         obj._nMargin, obj._nBorder = 10, 5
@@ -122,7 +124,14 @@ return {
             elseif event == _Interactivity.EVENT_MOUSEMOTION then
                 self._bSliderHover = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), _GetRCSlider(self))
                 local _bInArea = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
-                if not self._bSelfHover and _bInArea then self._fnHoverCallback() end
+                local _bInArea = _Algorithm.CheckPointInRect(_Interactivity.GetCursorPosition(), self._rcSelf)
+                if _bInArea then
+                    if not self._bSelfHover then
+                        self._fnEnterCallback()
+                    end
+                elseif self._bSelfHover then
+                    self._fnLeaveCallback()
+                end
                 self._bSelfHover = _bInArea
                 if self._bSliderDown then
                     local _tbCursorPos = _Interactivity.GetCursorPosition()
@@ -262,8 +271,12 @@ return {
             _UpdateText(self)
         end
 
-        function obj:SetHoverCallback(callback)
-            self._fnHoverCallback = callback
+        function obj:SetEnterCallback(callback)
+            self._fnEnterCallback = callback
+        end
+
+        function obj:SetLeaveCallback(callback)
+            self._fnLeaveCallback = callback
         end
 
         function obj:SetSliderEnable(flag)

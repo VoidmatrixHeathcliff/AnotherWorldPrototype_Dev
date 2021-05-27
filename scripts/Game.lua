@@ -88,7 +88,7 @@ os.execute("chcp 65001")
 
 textView = mGUI.TextView()
 
-textView_1 = mGUI.TextView()
+-- textView_1 = mGUI.TextView()
 -- textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
 -- textView_1:Transform({
 --     x = 650, y = 90,
@@ -99,12 +99,25 @@ textView_1 = mGUI.TextView()
 
 textIndex = 0
 
--- bIsEnable = false
+bIsEnable = false
 
-button = mGUI.Button({x = 800, y = 500, w = 120, h = 40}, "Button", 
-    function() textView:SetSliderEnable(false) end)
+button = mGUI.Button({x = 800, y = 500, w = 180, h = 40}, "显示提示信息", 
+    function()
+        bIsEnable = not bIsEnable
+        if bIsEnable then
+            button:SetText("隐藏提示信息")
+            mGUI.ShowPopTip("这是一句提示信息\n这是第二行提示信息可能吧？") 
+        else
+            button:SetText("显示提示信息")
+            mGUI.HidePopTip()
+        end
+    end)
 
--- button:SetHoverCallback(function() print(1) end)
+-- button:SetEnterCallback(function() mGUI.ShowPopTip() end)
+-- button:SetLeaveCallback(function() mGUI.HidePopTip() end)
+
+-- textView:SetEnterCallback(function() mGUI.ShowPopTip("这里是一个不可编辑的文本列表") end)
+-- textView:SetLeaveCallback(function() mGUI.HidePopTip() end)
 
 for _, text in ipairs(textList) do
     textView:AppendText(text)
@@ -144,6 +157,7 @@ while g_bIsRunning do
         elseif _event == mInteract.EVENT_KEYDOWN_N then
             textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
         end
+
         mGUI.UpdateEvent(_event)
     end
 
