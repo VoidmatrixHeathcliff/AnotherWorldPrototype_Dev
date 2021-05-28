@@ -76,26 +76,7 @@ textList = {
 
 os.execute("chcp 65001")
 
--- local resultStrList = {}
---     -- string.gsub("这是\n中文字符\n中间添加了换行符\n测试\n",'[^\n]+',function ( w )
---     --     table.insert(resultStrList,w)
---     -- end)
---     for match in string.gmatch("这是\n中文字符\n中间添加了换行符\n测试\n\n", "(.-)\n") do
---         table.insert(resultStrList, match)
---     end 
--- for _, str in ipairs(resultStrList) do print(str) end
--- print(#resultStrList)
-
 textView = mGUI.TextView({})
-
--- textView_1 = mGUI.TextView()
--- textView_1:AppendText("【小刚】装备【守护者之盾】，自身物理防御提升 30 点，每回合生命值回复提升 75 点")
--- textView_1:Transform({
---     x = 650, y = 90,
---     w = 395, h = 600
--- })
-
--- textView:SetHoverCallback(function() print(2) end)
 
 textIndex = 0
 
@@ -106,7 +87,7 @@ button = mGUI.Button({rect = {x = 800, y = 500, w = 180, h = 40}, text = "显示
         bIsEnable = not bIsEnable
         if bIsEnable then
             button:SetText("隐藏提示信息")
-            mGUI.ShowPopTip({text = "这是一句提示信息\n这是第二行提示信息可能吧？"}) 
+            mGUI.ShowPopTip({text = "这是一句提示信息\n这可能是第二行提示信息吧？"}) 
         else
             button:SetText("显示提示信息")
             mGUI.HidePopTip()
@@ -129,10 +110,8 @@ textView:Transform({
     w = 500, h = 600
 })
 
-
 mGUI.Place(textView)
 mGUI.Place(button)
--- mGUI.Place(textView_1)
 
 while g_bIsRunning do
     
