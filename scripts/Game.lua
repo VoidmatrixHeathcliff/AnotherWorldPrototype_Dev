@@ -85,6 +85,7 @@ bIsEnable = false
 button = mGUI.Button({rect = {x = 800, y = 500, w = 180, h = 40}, text = "显示提示信息", 
     onClick = function()
         bIsEnable = not bIsEnable
+        textView:SetSliderEnable(bIsEnable)
         if bIsEnable then
             button:SetText("隐藏提示信息")
             mGUI.ShowPopTip({text = "这是一句提示信息\n这可能是第二行提示信息吧？"}) 

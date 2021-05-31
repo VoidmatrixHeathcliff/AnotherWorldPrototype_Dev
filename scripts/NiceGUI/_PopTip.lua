@@ -4,9 +4,9 @@ PopTip：弹出式提示框
 
 Meta:
     + _Show
-        - font
-        - text
-        - color
+        - font / userdata-Graphic.Font
+        - text / string
+        - color / table
     + _Hide
     + _DrawSelf
 API:

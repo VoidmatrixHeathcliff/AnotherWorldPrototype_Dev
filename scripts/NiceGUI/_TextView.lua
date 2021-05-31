@@ -3,6 +3,12 @@
 TextView：文本列表
 
 Meta:
+    + _New
+        - rect / table
+        - font / userdata-Graphic.Font 
+        - onEnter / function
+        - onLeave / function
+        - enableSlider / boolean
     + _HandleEvent
     + _DrawSelf
 API:
@@ -32,8 +38,13 @@ local function _GetRCSlider(self)
         h = self._rcViewPort.h / math.max(self._nTextHeight * #self._tbText, self._rcViewPort.h)
             * self._rcScrollBar.h
     }
-    -- 当文本列表中无文本时修正滑块y坐标
-    if #self._tbText == 0 then _rect.y = self._rcScrollBar.y end
+    -- 当滑块被禁用时修正y坐标和高度
+    if not self._bSliderEnable then
+        _rect.y, _rect.h = self._rcScrollBar.y, self._rcScrollBar.h
+    else
+        -- 当文本列表中无文本时修正滑块y坐标
+        if #self._tbText == 0 then _rect.y = self._rcScrollBar.y end
+    end
     return _rect
 end
 
@@ -86,7 +97,11 @@ return {
         obj._nWidthScrollBar = 15
         obj._nPreviousY = 0
         obj._bSliderDown, obj._bSliderHover = false, false
-        obj._bSliderEnable = true
+        if values.enableSlider == nil then
+            obj._bSliderEnable = true
+        else
+            obj._bSliderEnable = values.enableSlider
+        end
         obj._bSelfHover = false
         obj._rcSelf = {
             x = 0, y = 0,
@@ -175,21 +190,21 @@ return {
             _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
             _Graphic.FillRectangle(self._rcScrollBar)
             -- 绘制侧边滚动条滑块部分
-            if self._bSliderDown then
-                _Graphic.SetDrawColor({r = 165, g = 165, b = 165, a = 255})
-            elseif self._bSliderHover then
-                _Graphic.SetDrawColor({r = 205, g = 205, b = 205, a = 255})
+            if not self._bSliderEnable then 
+                _Graphic.SetDrawColor({r = 135, g = 135, b = 135, a = 255})
             else
-                _Graphic.SetDrawColor({r = 185, g = 185, b = 185, a = 255})
+                if self._bSliderDown then
+                    _Graphic.SetDrawColor({r = 165, g = 165, b = 165, a = 255})
+                elseif self._bSliderHover then
+                    _Graphic.SetDrawColor({r = 205, g = 205, b = 205, a = 255})
+                else
+                    _Graphic.SetDrawColor({r = 185, g = 185, b = 185, a = 255})
+                end
             end
+            
             _Graphic.FillRectangle(_GetRCSlider(self))
             -- 绘制侧边滚动条边框线
             _Utils.DrawRectSolidBorder(self._rcScrollBar, 2)
-            -- 如果滑块状态为禁用则绘制蒙版
-            if not self._bSliderEnable then 
-                _Graphic.SetDrawColor({r = 185, g = 185, b = 185, a = 120})
-                _Graphic.FillRectangle(self._rcScrollBar)
-            end
             -- 绘制文本内容
             local _rcCopyDst = {
                 x = self._rcContent.x + self._nMargin,

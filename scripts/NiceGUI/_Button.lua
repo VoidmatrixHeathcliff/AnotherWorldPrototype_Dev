@@ -4,9 +4,12 @@ Button：按钮
 
 Meta:
     + _New
-        - rect
-        - font
-        - onClick
+        - rect / table
+        - font / userdata-Graphic.Font
+        - onClick / function
+        - onEnter / function
+        - onLeave / function
+        - enable / boolean
     + _HandleEvent
     + _DrawSelf
 API:
@@ -45,7 +48,11 @@ return {
         obj._fnEnterCallback = values.onEnter or function() end
         obj._fnLeaveCallback = values.onLeave or function() end
         obj._bSelfHover, obj._bSelfDown = false, false
-        obj._bSelfEnable = true
+        if values.enable == nil then
+            obj._bSelfEnable = true
+        else
+            obj._bSelfEnable = values.enable
+        end
         obj._nMarginHorizontal, obj._nMarginVertical = 15, 8
         obj._rcSelf = {
             x = 0, y = 0,
