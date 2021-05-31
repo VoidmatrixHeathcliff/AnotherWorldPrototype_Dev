@@ -1,6 +1,7 @@
 local _TextView = UsingModule("NiceGUI._TextView")
 local _Button = UsingModule("NiceGUI._Button")
 local _PopTip = UsingModule("NiceGUI._PopTip")
+local _Label = UsingModule("NiceGUI._Label")
 
 local _tbElements = {}
 
@@ -48,6 +49,10 @@ return {
 
     HidePopTip = function()
         _PopTip._Hide()
+    end,
+
+    Label = function(values)
+        return _Label._New(values)
     end,
 
 }

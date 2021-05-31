@@ -9,6 +9,8 @@ Meta:
         - onEnter / function
         - onLeave / function
         - enableSlider / boolean
+        - colorText / table
+        - colorBack / table
     + _HandleEvent
     + _DrawSelf
 API:
@@ -84,13 +86,15 @@ return {
     
     _New = function(values)
 
-        assert(values)
+        assert(type(values) == "table")
 
         obj = {}
 
         obj._uFont = values.font or _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 16)
         obj._fnEnterCallback = values.onEnter or function() end
         obj._fnLeaveCallback = values.onLeave or function() end
+        obj._clrText = values.colorText or {r = 200, g = 200, b = 200, a = 255}
+        obj._clrBack = values.colorBack or {r = 25, g = 25, b = 25, a = 255}
         obj._nTextHeight = obj._uFont:GetHeight()
         obj._tbText, obj._tbRawText = {}, {}
         obj._nMargin, obj._nBorder = 10, 5
@@ -182,12 +186,12 @@ return {
 
         function obj:_DrawSelf()
             -- 绘制文本区域底色
-            _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
+            _Graphic.SetDrawColor(self._clrBack)
             _Graphic.FillRectangle(self._rcContent)
             -- 绘制文本区域立体边框线
             _Utils.DrawRectSolidBorder(self._rcContent, 2)
             -- 绘制侧边滚动条底色
-            _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
+            _Graphic.SetDrawColor(self._clrBack)
             _Graphic.FillRectangle(self._rcScrollBar)
             -- 绘制侧边滚动条滑块部分
             if not self._bSliderEnable then 
@@ -224,7 +228,7 @@ return {
                 if not self._tbRenderedText[index] then
                     local _image = _Graphic.CreateUTF8TextImageBlended(
                         self._uFont, self._tbText[index],
-                        {r = 200, g = 200, b = 200, a = 255}
+                        self._clrText
                     )
                     local _width, _height = _image:GetSize()
                     self._tbRenderedText[index] = {

@@ -82,9 +82,21 @@ textIndex = 0
 
 bIsEnable = false
 
+label = mGUI.Label({
+    text = "这是第一行文本标签\n这是第二行？逗我呢？这行超长的我说！\n这是第三行……",
+    rect = {x = 850, y = 100}
+})
+
+width_label = 350
+
+mGUI.Place(label)
+
 button = mGUI.Button({rect = {x = 800, y = 500, w = 180, h = 40}, text = "显示提示信息", 
     onClick = function()
         bIsEnable = not bIsEnable
+        label:SetText("这是一小行\n第二小行参上！芜湖~")
+        -- label:Transform({w = width_label})
+        width_label = width_label - 50
         textView:SetSliderEnable(bIsEnable)
         if bIsEnable then
             button:SetText("隐藏提示信息")
@@ -93,7 +105,10 @@ button = mGUI.Button({rect = {x = 800, y = 500, w = 180, h = 40}, text = "显示
             button:SetText("显示提示信息")
             mGUI.HidePopTip()
         end
-    end})
+    end,
+    colorBack = {r = 200, g = 100, b = 75, a = 255},
+    colorText = {r = 50, g = 75, b = 150, a = 255}
+})
 
 -- button:SetEnterCallback(function() mGUI.ShowPopTip() end)
 -- button:SetLeaveCallback(function() mGUI.HidePopTip() end)

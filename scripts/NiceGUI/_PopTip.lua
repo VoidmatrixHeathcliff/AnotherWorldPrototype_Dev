@@ -6,7 +6,8 @@ Meta:
     + _Show
         - font / userdata-Graphic.Font
         - text / string
-        - color / table
+        - colorText / table
+        - colorBack / table
     + _Hide
     + _DrawSelf
 API:
@@ -25,6 +26,7 @@ local _nMargin, _nOffset = 10, 10
 local _bSelfEnable = false
 local _strText = "提示信息"
 local _clrText = {r = 246, g = 173, b = 73, a = 255}
+local _clrBack = {r = 25, g = 25, b = 25, a = 255}
 local _tbRenderedText = {}
 local _rcSelf = {x = 0, y = 0, w = 0, h = 0}
 
@@ -32,14 +34,14 @@ return {
 
     _Show = function(values)
 
-        assert(values)
+        assert(type(values) == "table")
         
         _bSelfEnable = true
-        values.text = values.text or _strText
-        _clrText = values.color or _clrText
+        _clrText = values.colorText or _clrText
+        _clrBack = values.colorBack or _clrBack
         _uFont = values.font or _uFont
         _nTextHeight = _uFont:GetHeight()
-        if values.text ~= _strText then
+        if values.text and values.text ~= _strText then
             _strText = values.text
             _tbRenderedText = {}
             -- 根据换行符裁剪字符串并将其渲染数据保存到表中
@@ -90,7 +92,7 @@ return {
             -- 绘制气泡边框和底色
             _Graphic.SetDrawColor({r = 215, g = 215, b = 215, a = 255})
             _Graphic.FillRoundRectangle(_rcSelf, 8)
-            _Graphic.SetDrawColor({r = 25, g = 25, b = 25, a = 255})
+            _Graphic.SetDrawColor(_clrBack)
             _Graphic.FillRoundRectangle({
                 x = _rcSelf.x + 2,
                 y = _rcSelf.y + 2,
