@@ -2,6 +2,7 @@ local _TextView = UsingModule("NiceGUI._TextView")
 local _Button = UsingModule("NiceGUI._Button")
 local _PopTip = UsingModule("NiceGUI._PopTip")
 local _Label = UsingModule("NiceGUI._Label")
+local _ImageView = UsingModule("NiceGUI._ImageView")
 
 local _tbElements = {}
 
@@ -53,6 +54,10 @@ return {
 
     Label = function(values)
         return _Label._New(values)
+    end,
+
+    ImageView = function(values)
+        return _ImageView._New(values)
     end,
 
 }

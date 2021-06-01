@@ -1,30 +1,29 @@
 --[[
 
-Label：文本标签
+ImageView：图片
 
 Meta:
     + _New:
-        - rect / table
-        - text / string
-        - font / userdata-Graphic.Font
+        - rect
+        - image
         - isShowBorder / boolean
         - isShowBack / boolean
         - isAutoSize / boolean
         - onEnter / function
         - onLeave / function
-        - colorText / table
         - colorBack / table
+        - margin
     + _HandleEvent
     + _DrawSelf
 
 API:
-    + GetText
-    + SetText
+    + SetImage
+    + SetAplha
     + SetBackShow
     + SetBorderShow
     + SetBackColor
-    + SetTextColor
     + SetAutoSize
+    + SetMargin
     + Transform
 
 --]]
@@ -35,31 +34,11 @@ local _Graphic = UsingModule("Graphic")
 local _Algorithm = UsingModule("Algorithm")
 local _Interactivity = UsingModule("Interactivity")
 
-local function _UpdateRenderedText(self)
-    self._tbRenderedText = {}
-    self._nMaxWidth = 0
-    string.gsub(self._strText, '[^\n]+', function (strFragment)
-            local _image = _Graphic.CreateUTF8TextImageBlended(
-                self._uFont, strFragment, self._clrText)
-            local _width, _height = _image:GetSize()
-            self._nMaxWidth = math.max(self._nMaxWidth, _width)
-            table.insert(self._tbRenderedText, {
-                texture = _Graphic.CreateTexture(_image),
-                width = _width
-            })
-        end)
-end
-
-local function _UpdateStretchRatio(self)
-    self._nStretchRatioHorizontal = (self._rcSelf.w - self._nMargin * 2) / self._nMaxWidth
-    self._nStretchRatioVertical = (self._rcSelf.h - self._nMargin * 2) 
-        / (#self._tbRenderedText * self._nTextHeight)
-end
-
 local function _ResizeAuto(self)
-    self._rcSelf.w = self._nMaxWidth + self._nMargin * 2
-    self._rcSelf.h = #self._tbRenderedText * self._nTextHeight + self._nMargin * 2
+    self._rcSelf.w = self._nwidthImage + self._nMargin * 2
+    self._rcSelf.h = self._nHeightImage + self._nMargin * 2
 end
+
 
 return {
 
@@ -69,9 +48,8 @@ return {
 
         obj = {}
 
-        obj._uFont = values.font or _Graphic.LoadFontFromFile("./res/font/SIMYOU.TTF", 16)
-        obj._nTextHeight = obj._uFont:GetHeight()
-        obj._strText = values.text or "Label"
+        local _image = values.image or _Graphic.LoadImageFromFile("Creeper.png")
+        obj._uTexture = _Graphic.CreateTexture(_image)
         if values.isShowBorder == nil then
             obj._bIsShowBorder = false
         else
@@ -90,10 +68,9 @@ return {
         obj._fnEnterCallback = values.onEnter or function() end
         obj._fnLeaveCallback = values.onLeave or function() end
         obj._bSelfHover = false
-        obj._nMargin = 10
-        obj._clrText = values.colorText or {r = 200, g = 200, b = 200, a = 255}
+        obj._nMargin = values.margin or 10
         obj._clrBack = values.colorBack or {r = 25, g = 25, b = 25, a = 255}
-        _UpdateRenderedText(obj)
+        obj._nwidthImage, obj._nHeightImage = _image:GetSize()
         obj._rcSelf = {x = 0, y = 0}
         _ResizeAuto(obj)
         if values.rect then
@@ -107,7 +84,6 @@ return {
         if obj._bIsAutoSize then
             _ResizeAuto(obj)
         end
-        _UpdateStretchRatio(obj)
 
         function obj:_HandleEvent(event)
             if event == _Interactivity.EVENT_MOUSEMOTION then
@@ -135,28 +111,25 @@ return {
                 _Graphic.SetDrawColor(self._clrBack)
                 _Utils.DrawRectSolidBorder(self._rcSelf, 2)
             end
-            -- 绘制文本内容
-            for index, data in pairs(self._tbRenderedText) do
-                _Graphic.CopyTexture(data.texture, {
-                    x = self._rcSelf.x + self._nMargin,
-                    y = self._rcSelf.y + self._nMargin + self._nTextHeight * (index - 1) * self._nStretchRatioVertical,
-                    w = data.width * self._nStretchRatioHorizontal,
-                    h = self._nTextHeight * self._nStretchRatioVertical
-                })
-            end
+            -- 绘制图片内容
+            _Graphic.CopyTexture(self._uTexture, {
+                x = self._rcSelf.x + self._nMargin,
+                y = self._rcSelf.y + self._nMargin,
+                w = self._rcSelf.w - self._nMargin * 2,
+                h = self._rcSelf.h - self._nMargin * 2
+            })
         end
 
-        function obj:GetText()
-            return obj._strText
-        end
-
-        function obj:SetText(text)
-            self._strText = text
-            _UpdateRenderedText(self)
+        function obj:SetImage(image)
+            self._uTexture = _Graphic.CreateTexture(image)
+            self._nwidthImage, self._nHeightImage = image:GetSize()
             if self._bIsAutoSize then
                 _ResizeAuto(self)
             end
-            _UpdateStretchRatio(self)
+        end
+
+        function obj:SetAplha(alpha)
+            self._uTexture:SetAlpha(alpha)
         end
 
         function obj:SetBackShow(flag)
@@ -171,17 +144,18 @@ return {
             self._clrBack = color
         end
 
-        function obj:SetTextColor(color)
-            self._clrText = color
-            _UpdateRenderedText(self)
-        end
-
         function obj:SetAutoSize(flag)
             self._bIsAutoSize = flag
             if self._bIsAutoSize then
                 _ResizeAuto(self)
             end
-            _UpdateStretchRatio(self)
+        end
+
+        function obj:SetMargin(margin)
+            self._nMargin = margin
+            if self._bIsAutoSize then
+                _ResizeAuto(self)
+            end 
         end
 
         function obj:Transform(rect)
@@ -195,7 +169,6 @@ return {
                 w = rect.w or self._rcSelf.w,
                 h = rect.h or self._rcSelf.h,
             }
-            _UpdateStretchRatio(self)
         end
 
         return obj

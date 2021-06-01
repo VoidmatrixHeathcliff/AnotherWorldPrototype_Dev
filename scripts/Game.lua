@@ -84,17 +84,40 @@ bIsEnable = false
 
 label = mGUI.Label({
     text = "这是第一行文本标签\n这是第二行？逗我呢？这行超长的我说！\n这是第三行……",
-    rect = {x = 850, y = 100}
+    rect = {x = 850, y = 100},
+    onEnter = function() print("Enter") end,
+    onLeave = function() print("Leave") end,
+    isAutoSize = true
 })
-
 width_label = 350
-
 mGUI.Place(label)
+
+imageView = mGUI.ImageView({
+    rect = {x = 800, y = 200, w = 420, h = 240},
+    isShowBack = true, isShowBorder = true, isAutoSize = true,
+    -- image = mGraphic.LoadImageFromFile("D:\\壁纸\\background.jpg"),
+    onEnter = function() 
+        print("Enter")
+        imageView:SetAutoSize(true)
+        imageView:SetMargin(0) 
+    end,
+    onLeave = function() print("Leave") end,
+})
+alpha_image = 255
+mGUI.Place(imageView)
+
 
 button = mGUI.Button({rect = {x = 800, y = 500, w = 180, h = 40}, text = "显示提示信息", 
     onClick = function()
         bIsEnable = not bIsEnable
         label:SetText("这是一小行\n第二小行参上！芜湖~")
+        label:SetBackColor({r = 10, g = 100, b = 175, a = 255})
+        label:SetTextColor({r = 255, g = 0, b = 175, a = 255})
+        label:SetBackShow(true)
+        label:SetBorderShow(true)
+        alpha_image = alpha_image - 100
+        imageView:SetAplha(alpha_image)
+        imageView:SetImage(mGraphic.LoadImageFromFile("Creeper.png"))
         -- label:Transform({w = width_label})
         width_label = width_label - 50
         textView:SetSliderEnable(bIsEnable)
